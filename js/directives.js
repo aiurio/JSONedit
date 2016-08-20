@@ -25,7 +25,9 @@ angular.module('JSONedit', ['ui.sortable'])
     scope: {
       child: '=',
       type: '@',
-      defaultCollapsed: '='
+      defaultCollapsed: '=',
+      source: '=',
+      change: '&'
     },
     link: function(scope, element, attributes) {
         var stringName = "Text";
@@ -85,6 +87,7 @@ angular.module('JSONedit', ['ui.sortable'])
             }
         };
         scope.moveKey = function(obj, key, newkey) {
+            scope.change({attach: scope.source})
             //moves key to newkey in obj
             if (key !== newkey) {
                 obj[newkey] = obj[key];
@@ -92,6 +95,7 @@ angular.module('JSONedit', ['ui.sortable'])
             }
         };
         scope.deleteKey = function(obj, key) {
+            scope.change({attach: scope.source})
             if (getType(obj) == "Object") {
                 if( confirm('Delete "'+key+'" and all it contains?') ) {
                     delete obj[key];
@@ -105,6 +109,7 @@ angular.module('JSONedit', ['ui.sortable'])
             }
         };
         scope.addItem = function(obj) {
+            scope.change({attach: scope.source})
             if (getType(obj) == "Object") {
                 // check input for key
                 if (scope.keyName == undefined || scope.keyName.length == 0){
@@ -185,8 +190,8 @@ angular.module('JSONedit', ['ui.sortable'])
         // recursion
         var switchTemplate = 
             '<span ng-switch on="getType(val)" >'
-                + '<json ng-switch-when="Object" child="val" type="object" default-collapsed="defaultCollapsed"></json>'
-                + '<json ng-switch-when="Array" child="val" type="array" default-collapsed="defaultCollapsed"></json>'
+                + '<json ng-switch-when="Object" source="source" change="change(attach)" child="val" type="object" default-collapsed="defaultCollapsed"></json>'
+                + '<json ng-switch-when="Array" source="source" change="change(attach)" child="val" type="array" default-collapsed="defaultCollapsed"></json>'
                 + '<span ng-switch-when="Boolean" type="boolean">'
                     + '<input type="checkbox" ng-model="val" ng-model-onblur ng-change="child[key] = val">'
                 + '</span>'
